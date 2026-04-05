@@ -1,0 +1,106 @@
+# 必要なライブラリのインポート
+import csv
+import urllib.request
+import json
+import streamlit as st
+import asyncio
+from strands import Agent, tool
+from strands.models.anthropic import AnthropicModel
+from dotenv import load_dotenv
+
+# 環境変数の読み込み
+load_dotenv()
+
+# ツールの定義
+@tool
+def get_weather(city: str = "Tokyo") -> str:
+    """指定した都市の現在の天気を取得する。デフォルトは東京。"""
+    # Open-Meteo API（無料・キー不要）で指定された都市の天気を取得
+    url = "https://api.open-meteo.com/v1/forecast?latitude=35.6895&longitude=139.6917&current_weather=true"
+    with urllib.request.urlopen(url) as res:
+        data = json.loads(res.read())
+
+    # 取得したデータから現在の天気情報を取り出して返す
+    return json.dumps(data["current_weather"], ensure_ascii=False)
+
+@tool
+def search_events() -> str:
+    """開催中のイベント一覧を返す。"""
+    # ローカルのCSVファイルからイベント情報を読み込む
+    with open('event_data.csv', 'r', encoding='utf-8') as f:
+        rows = list(csv.DictReader(f))
+    return f"イベント({len(rows)}件):\n{rows}"
+
+# 利用するモデルの指定
+model = AnthropicModel(
+    model_id="claude-sonnet-4-6",
+    max_tokens=4096
+)
+
+# システムプロンプトの定義
+SYSTEM_PROMPT = """あなたはお出かけプランナーです。
+ユーザーの希望に合わせて、天気と最新のイベント情報をもとにお出かけプランを提案してください。"""
+
+# エージェントの作成
+agent = Agent(
+    model=model,
+    system_prompt=SYSTEM_PROMPT,
+    tools=[get_weather, search_events],
+)
+
+# ページタイトルの表示
+st.title("🗺️ お出かけプランナー")
+
+# Streamlitは操作のたびにスクリプト全体が再実行されるため、session_stateで会話履歴を保持
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+
+# 保存済みの会話履歴を再表示
+for msg in st.session_state.messages:
+    with st.chat_message(msg["role"]):
+        for name in msg.get("tool_names", []):
+            st.write(f"🔧 ツール実行: {name}")
+        st.markdown(msg["content"])
+
+# エージェントをストリーミング実行し、UIにリアルタイムに表示
+async def run_agent(query: str, status, response_area):
+    text = ""
+    tool_names = []
+
+    # エージェントのストリーミング出力を逐次処理
+    async for event in agent.stream_async(query):
+        if "data" in event:
+            # 生成されたテキストをリアルタイムに表示
+            text += event["data"]
+            response_area.markdown(text.replace("<br>", "\n"))
+        elif "current_tool_use" in event:
+            # エージェントがツールを呼び出したらステータスに表示
+            name = event["current_tool_use"].get("name", "")
+            if name and name not in tool_names:
+                tool_names.append(name)
+                status.write(f"🔧 ツール実行: {name}")
+
+    # ストリーミング完了後、ステータスを更新
+    status.update(label="完了", state="complete", expanded=False)
+    return text.replace("<br>", "\n"), tool_names
+
+# ユーザー入力の処理
+if prompt := st.chat_input("お出かけの相談をしてください"):
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    # ユーザーのメッセージを表示
+    with st.chat_message("user"):
+        st.markdown(prompt)
+
+    # エージェントの応答を表示
+    with st.chat_message("assistant"):
+        # st.statusで処理中の状態をユーザーに伝える
+        status = st.status("考え中...", expanded=True)
+        response_area = st.empty()
+        accumulated_text, tool_names = asyncio.run(run_agent(prompt, status, response_area))
+
+        # 次回再表示時に復元できるように会話履歴に保存
+        st.session_state.messages.append({
+            "role": "assistant",
+            "content": accumulated_text,
+            "tool_names": tool_names,
+        })
