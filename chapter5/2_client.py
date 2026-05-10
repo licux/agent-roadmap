@@ -39,17 +39,12 @@ model = AnthropicModel(
 SYSTEM_PROMPT = """あなたは料理アドバイザーです。
 recipe-assistantから取得したレシピ情報をもとに、output/ディレクトリにMarkdown形式の献立や買い物リストを作成・更新します。"""
 
-# 2つのMCPサーバーをwith句でまとめて起動・終了（ブロックを抜けるとサブプロセスが終了する）
-with recipe_client, fs_client:
-    # 両サーバーから提供されているツールを取得して結合
-    tools = recipe_client.list_tools_sync() + fs_client.list_tools_sync()
+# MCPClientをそのままtoolsに渡すと、Agentがライフサイクル（起動・終了）を自動管理する
+agent = Agent(
+    model=model,
+    system_prompt=SYSTEM_PROMPT,
+    tools=[recipe_client, fs_client],
+)
 
-    # エージェントの作成（自作ツールと既存ツールを区別せず1つのリストで渡す）
-    agent = Agent(
-        model=model,
-        system_prompt=SYSTEM_PROMPT,
-        tools=tools,
-    )
-
-    # エージェントの実行
-    agent("30分以内で作れる和食を3つ提案して、output/mealplan.md に保存してください")
+# エージェントの実行
+agent("30分以内で作れる和食を3つ提案して、output/mealplan.md に保存してください")
