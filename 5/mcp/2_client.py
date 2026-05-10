@@ -14,18 +14,20 @@ MODEL_ID = os.getenv("CLAUDE_MODEL_ID")
 # Filesystem MCPサーバーは起動時に許可ディレクトリの存在を確認するため、無ければ作成しておく
 Path("output").mkdir(exist_ok=True)
 
-# 自作のrecipe-assistant MCPサーバーへの接続設定（同じディレクトリの1_server.pyをサブプロセスで起動）
-recipe_client = MCPClient(lambda: stdio_client(
-    StdioServerParameters(command="python", args=["1_server.py"])
-))
+# MCPサーバーを起動するための関数を定義（MCPClientが必要なタイミングで内部から呼び出す）
+def start_recipe_server():
+    # 自作のrecipe-assistant MCPサーバー（同じディレクトリの1_server.pyをサブプロセスで起動）
+    return stdio_client(StdioServerParameters(command="python", args=["1_server.py"]))
 
-# 既存のFilesystem MCPサーバーへの接続設定（npxで取得して./outputを許可ディレクトリに指定）
-fs_client = MCPClient(lambda: stdio_client(
-    StdioServerParameters(
+def start_filesystem_server():
+    # 既存のFilesystem MCPサーバー（npxで取得して./outputを許可ディレクトリに指定）
+    return stdio_client(StdioServerParameters(
         command="npx",
         args=["-y", "@modelcontextprotocol/server-filesystem", "./output"],
-    )
-))
+    ))
+
+recipe_client = MCPClient(start_recipe_server)
+fs_client = MCPClient(start_filesystem_server)
 
 # 利用するモデルの指定
 model = AnthropicModel(
