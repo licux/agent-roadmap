@@ -1,6 +1,5 @@
 # 必要なライブラリのインポート
 import os
-from contextlib import ExitStack
 from pathlib import Path
 from mcp import stdio_client, StdioServerParameters
 from strands import Agent
@@ -10,7 +9,7 @@ from dotenv import load_dotenv
 
 # 環境変数の読み込み
 load_dotenv()
-MODEL_ID = os.getenv("CLAUDE_MODEL_ID", "claude-sonnet-4-6")
+MODEL_ID = os.getenv("CLAUDE_MODEL_ID")
 
 # Filesystem MCPサーバーは起動時に許可ディレクトリの存在を確認するため、無ければ作成しておく
 Path("output").mkdir(exist_ok=True)
@@ -38,12 +37,8 @@ model = AnthropicModel(
 SYSTEM_PROMPT = """あなたは料理アドバイザーです。
 recipe-assistantから取得したレシピ情報をもとに、output/ディレクトリにMarkdown形式の献立や買い物リストを作成・更新します。"""
 
-# 2つのMCPサーバーをExitStackでまとめて起動・終了
-# （with mcp_client as ... を2つネストするのと等価。ブロックを抜けるとサブプロセスが終了する）
-with ExitStack() as stack:
-    stack.enter_context(recipe_client)
-    stack.enter_context(fs_client)
-
+# 2つのMCPサーバーをwith句でまとめて起動・終了（ブロックを抜けるとサブプロセスが終了する）
+with recipe_client, fs_client:
     # 両サーバーから提供されているツールを取得して結合
     tools = recipe_client.list_tools_sync() + fs_client.list_tools_sync()
 

@@ -1,7 +1,6 @@
 # 必要なライブラリのインポート
 import os
 import asyncio
-from contextlib import ExitStack
 from pathlib import Path
 import streamlit as st
 from mcp import stdio_client, StdioServerParameters
@@ -31,21 +30,15 @@ def init_agent():
         )
     ))
 
-    # ExitStackで両サーバーをまとめて起動。stackをグローバルに保持してサブプロセスが終了しないようにする
-    stack = ExitStack()
-    stack.enter_context(recipe_client)
-    stack.enter_context(fs_client)
-
-    # 両サーバーのツールを結合してエージェントに渡す
-    tools = recipe_client.list_tools_sync() + fs_client.list_tools_sync()
+    # MCPClientをそのままtoolsに渡すと、Agentがライフサイクル（起動・終了）を自動管理する
     agent = Agent(
         model=AnthropicModel(model_id=MODEL_ID, max_tokens=4096),
         system_prompt="あなたは料理アドバイザーです。recipe-assistantから取得したレシピ情報をもとに、output/ディレクトリにMarkdown形式の献立や買い物リストを作成・更新します。",
-        tools=tools,
+        tools=[recipe_client, fs_client],
     )
-    return agent, stack
+    return agent
 
-agent, _ = init_agent()
+agent = init_agent()
 
 # ページタイトルの表示
 st.title("🍳 料理レシピアシスタント")
