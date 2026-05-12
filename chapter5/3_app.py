@@ -46,18 +46,6 @@ agent = init_agent()
 # ページタイトルの表示
 st.title("🍳 料理レシピアシスタント")
 
-# サイドバーにoutput/ディレクトリの内容を表示（filesystem MCPサーバーが書き出した結果が確認できる）
-with st.sidebar:
-    st.header("output/")
-    output_dir = Path("output")
-    files = sorted(output_dir.glob("*.md")) if output_dir.exists() else []
-    if files:
-        for f in files:
-            with st.expander(f"📄 {f.name}"):
-                st.markdown(f.read_text(encoding="utf-8"))
-    else:
-        st.write("（まだファイルがありません）")
-
 # Streamlitは操作のたびにスクリプト全体が再実行されるため、session_stateで会話履歴を保持
 if "messages" not in st.session_state:
     st.session_state.messages = []
@@ -111,6 +99,3 @@ if prompt := st.chat_input("レシピや献立について相談してくださ�
             "content": accumulated_text,
             "tool_names": tool_names,
         })
-
-    # サイドバーのoutput/一覧を最新化するため再描画（会話履歴はsession_stateに残るので消えない）
-    st.rerun()
