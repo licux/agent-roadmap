@@ -13,6 +13,9 @@ from dotenv import load_dotenv
 load_dotenv()
 MODEL_ID = os.getenv("CLAUDE_MODEL_ID", "claude-sonnet-4-6")
 
+# Filesystem MCPサーバーは起動時に許可ディレクトリの存在を確認するため、無ければ作成しておく
+Path("output").mkdir(exist_ok=True)
+
 # MCPサーバーを起動するための関数を定義（MCPClientが必要なタイミングで内部から呼び出す）
 def start_recipe_server():
     return stdio_client(StdioServerParameters(command="python", args=["1_server.py"]))
@@ -26,9 +29,6 @@ def start_filesystem_server():
 # Streamlitは操作のたびにスクリプト全体が再実行されるため、@st.cache_resourceでMCPクライアントとエージェントを1度だけ生成し、サブプロセスを使い回す
 @st.cache_resource
 def init_agent():
-    # Filesystem MCPサーバーは起動時に許可ディレクトリの存在を確認するため、無ければ作成しておく
-    Path("output").mkdir(exist_ok=True)
-
     # 自作と既存の2つのMCPサーバーへの接続を作成
     recipe_client = MCPClient(start_recipe_server)
     fs_client = MCPClient(start_filesystem_server)
