@@ -16,14 +16,25 @@ MODEL_ID = os.getenv("CLAUDE_MODEL_ID")
 # ツールの定義
 @tool
 def get_weather() -> str:
-    """東京の現在の天気を取得する。"""
+    """東京の天気予報を取得する。今日から16日先までの予報と現在の天気を返す。"""
     # Open-Meteo API（無料・キー不要）で東京の天気を取得
-    url = "https://api.open-meteo.com/v1/forecast?latitude=35.6895&longitude=139.6917&current_weather=true"
+    params = urllib.parse.urlencode({
+        "latitude": 35.6895,
+        "longitude": 139.6917,
+        "current_weather": "true",
+        "daily": "weather_code,temperature_2m_max,temperature_2m_min",
+        "timezone": "Asia/Tokyo",
+        "forecast_days": 16,
+    })
+    url = f"https://api.open-meteo.com/v1/forecast?{params}"
     with urllib.request.urlopen(url) as res:
         data = json.loads(res.read())
 
-    # 取得したデータから現在の天気情報を取り出して返す
-    return json.dumps(data["current_weather"], ensure_ascii=False)
+    # 現在の天気と日別予報をまとめて返す
+    return json.dumps({
+        "current_weather": data["current_weather"],
+        "daily": data["daily"],
+    }, ensure_ascii=False)
 
 @tool
 def search_events() -> str:
@@ -51,4 +62,4 @@ agent = Agent(
 )
 
 # エージェントの実行
-agent("今日東京でお出かけしたいんだけど、おすすめのプランを教えて")
+agent("明日でお出かけしたいんだけど、おすすめのプランを教えて")

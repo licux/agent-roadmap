@@ -1,57 +1,50 @@
 # 必要なライブラリのインポート
 import os
-import urllib.request
-import json
-import streamlit as st
 import asyncio
-from strands import Agent, tool
+from pathlib import Path
+import streamlit as st
+from mcp import stdio_client, StdioServerParameters
+from strands import Agent
 from strands.models.anthropic import AnthropicModel
+from strands.tools.mcp import MCPClient
 from dotenv import load_dotenv
-from tavily import TavilyClient
 
 # 環境変数の読み込み
 load_dotenv()
+MODEL_ID = os.getenv("CLAUDE_MODEL_ID")
 
-tavily_client = TavilyClient(api_key=os.getenv("TAVILY_API_KEY"))
+# Filesystem MCPサーバーは起動時に許可ディレクトリの存在を確認するため、無ければ作成しておく
+Path("output").mkdir(exist_ok=True)
 
-# ツールの定義
-@tool
-def get_weather() -> str:
-    """東京の現在の天気を取得する。"""
-    # Open-Meteo API（無料・キー不要）で東京の天気を取得
-    url = "https://api.open-meteo.com/v1/forecast?latitude=35.6895&longitude=139.6917&current_weather=true"
-    with urllib.request.urlopen(url) as res:
-        data = json.loads(res.read())
+# MCPサーバーを起動するための関数を定義（MCPClientが必要なタイミングで内部から呼び出す）
+def start_recipe_server():
+    return stdio_client(StdioServerParameters(command="uv", args=["run", "1_server.py"]))
 
-    # 取得したデータから現在の天気情報を取り出して返す
-    return json.dumps(data["current_weather"], ensure_ascii=False)
+def start_filesystem_server():
+    return stdio_client(StdioServerParameters(
+        command="npx",
+        args=["-y", "@modelcontextprotocol/server-filesystem", "./output"],
+    ))
 
-@tool
-def search_events(query: str) -> str:
-    """指定したキーワードでイベント情報をWeb検索する。"""
-    # Tavily APIでWeb検索を実行
-    result = tavily_client.search(query, max_results=5)
-    return json.dumps(result["results"], ensure_ascii=False)
+# Streamlitは操作のたびにスクリプト全体が再実行されるため、@st.cache_resourceでMCPクライアントとエージェントを1度だけ生成し、サブプロセスを使い回す
+@st.cache_resource
+def init_agent():
+    # 自作と既存の2つのMCPサーバーへの接続を作成
+    recipe_client = MCPClient(start_recipe_server)
+    fs_client = MCPClient(start_filesystem_server)
 
-# 利用するモデルの指定
-model = AnthropicModel(
-    model_id="claude-sonnet-4-6",
-    max_tokens=4096
-)
+    # MCPClientをそのままtoolsに渡すと、Agentがライフサイクル（起動・終了）を自動管理する
+    agent = Agent(
+        model=AnthropicModel(model_id=MODEL_ID, max_tokens=4096),
+        system_prompt="あなたは料理アドバイザーです。recipe-assistantから取得したレシピ情報をもとに、output/ディレクトリにMarkdown形式の献立や買い物リストを作成・更新します。",
+        tools=[recipe_client, fs_client],
+    )
+    return agent
 
-# システムプロンプトの定義
-SYSTEM_PROMPT = """あなたはお出かけプランナーです。
-ユーザーの希望に合わせて、天気と最新のイベント情報をもとにお出かけプランを提案してください。"""
-
-# エージェントの作成
-agent = Agent(
-    model=model,
-    system_prompt=SYSTEM_PROMPT,
-    tools=[get_weather, search_events],
-)
+agent = init_agent()
 
 # ページタイトルの表示
-st.title("🗺️ お出かけプランナー (Tavily)")
+st.title("🍳 料理レシピアシスタント")
 
 # Streamlitは操作のたびにスクリプト全体が再実行されるため、session_stateで会話履歴を保持
 if "messages" not in st.session_state:
@@ -87,7 +80,7 @@ async def run_agent(query: str, status, response_area):
     return text.replace("<br>", "\n"), tool_names
 
 # ユーザー入力の処理
-if prompt := st.chat_input("お出かけの相談をしてください"):
+if prompt := st.chat_input("レシピや献立について相談してください"):
     st.session_state.messages.append({"role": "user", "content": prompt})
     # ユーザーのメッセージを表示
     with st.chat_message("user"):

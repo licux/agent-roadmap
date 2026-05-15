@@ -1,50 +1,69 @@
 # 必要なライブラリのインポート
 import os
-import asyncio
-from pathlib import Path
+import csv
+import urllib.parse
+import urllib.request
+import json
 import streamlit as st
-from mcp import stdio_client, StdioServerParameters
-from strands import Agent
+import asyncio
+from strands import Agent, tool
 from strands.models.anthropic import AnthropicModel
-from strands.tools.mcp import MCPClient
 from dotenv import load_dotenv
 
 # 環境変数の読み込み
 load_dotenv()
-MODEL_ID = os.getenv("CLAUDE_MODEL_ID", "claude-sonnet-4-6")
+MODEL_ID = os.getenv("CLAUDE_MODEL_ID")
 
-# Filesystem MCPサーバーは起動時に許可ディレクトリの存在を確認するため、無ければ作成しておく
-Path("output").mkdir(exist_ok=True)
+# ツールの定義
+@tool
+def get_weather() -> str:
+    """東京の天気予報を取得する。今日から16日先までの予報と現在の天気を返す。"""
+    # Open-Meteo API（無料・キー不要）で東京の天気を取得
+    params = urllib.parse.urlencode({
+        "latitude": 35.6895,
+        "longitude": 139.6917,
+        "current_weather": "true",
+        "daily": "weather_code,temperature_2m_max,temperature_2m_min",
+        "timezone": "Asia/Tokyo",
+        "forecast_days": 16,
+    })
+    url = f"https://api.open-meteo.com/v1/forecast?{params}"
+    with urllib.request.urlopen(url) as res:
+        data = json.loads(res.read())
 
-# MCPサーバーを起動するための関数を定義（MCPClientが必要なタイミングで内部から呼び出す）
-def start_recipe_server():
-    return stdio_client(StdioServerParameters(command="uv", args=["run", "python", "mcp_server/main.py"]))
+    # 現在の天気と日別予報をまとめて返す
+    return json.dumps({
+        "current_weather": data["current_weather"],
+        "daily": data["daily"],
+    }, ensure_ascii=False)
 
-def start_filesystem_server():
-    return stdio_client(StdioServerParameters(
-        command="npx",
-        args=["-y", "@modelcontextprotocol/server-filesystem", "./output"],
-    ))
+@tool
+def search_events() -> str:
+    """開催中のイベント一覧を返す。"""
+    # ローカルのCSVファイルからイベント情報を読み込む
+    with open('event_data.csv', 'r', encoding='utf-8') as f:
+        rows = list(csv.DictReader(f))
+    return f"イベント({len(rows)}件):\n{rows}"
 
-# Streamlitは操作のたびにスクリプト全体が再実行されるため、@st.cache_resourceでMCPクライアントとエージェントを1度だけ生成し、サブプロセスを使い回す
-@st.cache_resource
-def init_agent():
-    # 自作と既存の2つのMCPサーバーへの接続を作成
-    recipe_client = MCPClient(start_recipe_server)
-    fs_client = MCPClient(start_filesystem_server)
+# 利用するモデルの指定
+model = AnthropicModel(
+    model_id=MODEL_ID,
+    max_tokens=4096
+)
 
-    # MCPClientをそのままtoolsに渡すと、Agentがライフサイクル（起動・終了）を自動管理する
-    agent = Agent(
-        model=AnthropicModel(model_id=MODEL_ID, max_tokens=4096),
-        system_prompt="あなたは料理アドバイザーです。recipe-assistantから取得したレシピ情報をもとに、output/ディレクトリにMarkdown形式の献立や買い物リストを作成・更新します。",
-        tools=[recipe_client, fs_client],
-    )
-    return agent
+# システムプロンプトの定義
+SYSTEM_PROMPT = """あなたはお出かけプランナーです。
+ユーザーの希望に合わせて、天気と最新のイベント情報をもとにお出かけプランを提案してください。"""
 
-agent = init_agent()
+# エージェントの作成
+agent = Agent(
+    model=model,
+    system_prompt=SYSTEM_PROMPT,
+    tools=[get_weather, search_events],
+)
 
 # ページタイトルの表示
-st.title("🍳 料理レシピアシスタント")
+st.title("🗺️ お出かけプランナー")
 
 # Streamlitは操作のたびにスクリプト全体が再実行されるため、session_stateで会話履歴を保持
 if "messages" not in st.session_state:
@@ -80,7 +99,7 @@ async def run_agent(query: str, status, response_area):
     return text.replace("<br>", "\n"), tool_names
 
 # ユーザー入力の処理
-if prompt := st.chat_input("レシピや献立について相談してください"):
+if prompt := st.chat_input("お出かけの相談をしてください"):
     st.session_state.messages.append({"role": "user", "content": prompt})
     # ユーザーのメッセージを表示
     with st.chat_message("user"):
