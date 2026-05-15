@@ -7,7 +7,7 @@ from mcp.server.fastmcp import FastMCP
 mcp = FastMCP("recipe-assistant")
 
 # recipes.jsonを起動時に一度だけ読み込み
-RECIPES = json.loads((Path(__file__).parent.parent / "recipes.json").read_text(encoding="utf-8"))
+RECIPES = json.loads((Path(__file__).parent / "recipes.json").read_text(encoding="utf-8"))
 
 # ツールの定義（@mcp.tool() でMCPツールとして公開される）
 @mcp.tool()

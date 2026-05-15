@@ -11,14 +11,14 @@ from dotenv import load_dotenv
 
 # 環境変数の読み込み
 load_dotenv()
-MODEL_ID = os.getenv("CLAUDE_MODEL_ID", "claude-sonnet-4-6")
+MODEL_ID = os.getenv("CLAUDE_MODEL_ID")
 
 # Filesystem MCPサーバーは起動時に許可ディレクトリの存在を確認するため、無ければ作成しておく
 Path("output").mkdir(exist_ok=True)
 
 # MCPサーバーを起動するための関数を定義（MCPClientが必要なタイミングで内部から呼び出す）
 def start_recipe_server():
-    return stdio_client(StdioServerParameters(command="uv", args=["run", "python", "mcp_server/main.py"]))
+    return stdio_client(StdioServerParameters(command="uv", args=["run", "1_server.py"]))
 
 def start_filesystem_server():
     return stdio_client(StdioServerParameters(
