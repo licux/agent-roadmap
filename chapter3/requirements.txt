@@ -1,6 +1,5 @@
-mcp==1.27.1
 strands-agents[anthropic]==1.40.0
 strands-agents-tools==0.5.3
 anthropic==0.102.0
 python-dotenv==1.2.2
-streamlit==1.57.0
+streamlit==1.5.7
