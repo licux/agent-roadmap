@@ -1,0 +1,9 @@
+[
+    {"id":"R001","name":"鶏むね肉のグリル","genre":"和食","cooking_time_min":20,"ingredients":["鶏むね肉","塩","オリーブオイル"]},
+    {"id":"R002","name":"カプレーゼ","genre":"洋食","cooking_time_min":10,"ingredients":["トマト","モッツァレラ","バジル"]},
+    {"id":"R003","name":"麻婆豆腐","genre":"中華","cooking_time_min":25,"ingredients":["豆腐","豚ひき肉","豆板醤"]},
+    {"id":"R004","name":"鮭のホイル焼き","genre":"和食","cooking_time_min":25,"ingredients":["鮭","しめじ","玉ねぎ"]},
+    {"id":"R005","name":"カルボナーラ","genre":"洋食","cooking_time_min":15,"ingredients":["スパゲッティ","卵","ベーコン"]},
+    {"id":"R006","name":"野菜炒め","genre":"中華","cooking_time_min":15,"ingredients":["キャベツ","豚肉","ごま油"]},
+    {"id":"R007","name":"豚の生姜焼き","genre":"和食","cooking_time_min":20,"ingredients":["豚ロース","生姜","醤油"]}
+]
