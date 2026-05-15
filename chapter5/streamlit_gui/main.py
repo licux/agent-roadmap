@@ -18,7 +18,7 @@ Path("output").mkdir(exist_ok=True)
 
 # MCPサーバーを起動するための関数を定義（MCPClientが必要なタイミングで内部から呼び出す）
 def start_recipe_server():
-    return stdio_client(StdioServerParameters(command="python", args=["1_server.py"]))
+    return stdio_client(StdioServerParameters(command="uv", args=["run", "python", "mcp_server/main.py"]))
 
 def start_filesystem_server():
     return stdio_client(StdioServerParameters(
