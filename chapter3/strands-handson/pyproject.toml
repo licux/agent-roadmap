@@ -9,4 +9,5 @@ dependencies = [
     "python-dotenv==1.2.2",
     "strands-agents[anthropic]==1.40.0",
     "streamlit==1.57.0",
+    "tavily-python==0.7.24",
 ]
