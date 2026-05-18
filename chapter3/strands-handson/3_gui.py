@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 
 # 環境変数の読み込み
 load_dotenv()
-MODEL_ID = os.getenv("CLAUDE_MODEL_ID")
+MODEL_ID = os.getenv("MODEL_NAME")
 
 # ツールの定義
 @tool

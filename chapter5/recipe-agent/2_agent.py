@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 
 # 環境変数の読み込み
 load_dotenv()
-MODEL_ID = os.getenv("CLAUDE_MODEL_ID")
+MODEL_ID = os.getenv("MODEL_NAME")
 
 # Filesystem MCPサーバーは起動時に許可ディレクトリの存在を確認するため、無ければ作成しておく
 Path("output").mkdir(exist_ok=True)
@@ -36,7 +36,7 @@ model = AnthropicModel(
 )
 
 # システムプロンプトの定義
-SYSTEM_PROMPT = """あなたは料理アドバイザーです。
+SYSTEM_PROMPT = """あなたは料理レシピアシスタントです。
 recipe-assistantから取得したレシピ情報をもとに、output/ディレクトリにMarkdown形式の献立や買い物リストを作成・更新します。"""
 
 # MCPClientをそのままtoolsに渡すと、Agentがライフサイクル（起動・終了）を自動管理する

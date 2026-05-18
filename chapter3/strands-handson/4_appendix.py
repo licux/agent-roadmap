@@ -14,7 +14,7 @@ from dotenv import load_dotenv
 
 # 環境変数の読み込み
 load_dotenv()
-MODEL_ID = os.getenv("CLAUDE_MODEL_ID")
+MODEL_ID = os.getenv("MODEL_NAME")
 
 tavily_client = TavilyClient(api_key=os.getenv("TAVILY_API_KEY"))
 
