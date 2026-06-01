@@ -55,19 +55,25 @@ model = AnthropicModel(
 SYSTEM_PROMPT = """あなたはお出かけプランナーです。
 ユーザーの希望に合わせて、天気と最新のイベント情報をもとにお出かけプランを提案してください。"""
 
-# エージェントの作成
-agent = Agent(
-    model=model,
-    system_prompt=SYSTEM_PROMPT,
-    tools=[get_weather, search_events],
-)
 
 # ページタイトルの表示
 st.title("🗺️ お出かけプランナー")
 
-# Streamlitは操作のたびにスクリプト全体が再実行されるため、session_stateで会話履歴を保持
+# Streamlitは操作のたびにスクリプト全体が再実行されるため、session_stateで会話履歴を保持。
+# ・st.session_state.messages : 表示用の会話履歴
+# ・st.session_state.history : エージェントの会話履歴
 if "messages" not in st.session_state:
     st.session_state.messages = []
+if "history" not in st.session_state:
+    st.session_state.history = []
+
+# エージェントは再実行のたびに生成されるため、保存しておいた会話履歴をmessages引数で復元する。
+agent = Agent(
+    model=model,
+    system_prompt=SYSTEM_PROMPT,
+    tools=[get_weather, search_events],
+    messages=st.session_state.history.copy(),
+)
 
 # 保存済みの会話履歴を再表示
 for msg in st.session_state.messages:
@@ -118,3 +124,7 @@ if prompt := st.chat_input("お出かけの相談をしてください"):
             "content": accumulated_text,
             "tool_names": tool_names,
         })
+
+        # エージェントの会話履歴（ツール呼び出し等も含む完全な履歴）を保存し、
+        # 次のターンでmessages引数として復元できるようにする
+        st.session_state.history = agent.messages
