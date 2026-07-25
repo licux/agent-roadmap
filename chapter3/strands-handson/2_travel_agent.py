@@ -1,7 +1,6 @@
 # 必要なライブラリのインポート
 import os
 import csv
-import urllib.error
 import urllib.parse
 import urllib.request
 import json
