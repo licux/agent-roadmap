@@ -33,6 +33,7 @@ def get_weather() -> str:
     return json.dumps({
         "current_weather": data["current_weather"],
         "daily": data["daily"],
+        "weather_code_legend": "0-3晴曇/45霧/51雨/71雪/80驟雨/95雷雨",
     }, ensure_ascii=False)
 
 @tool
