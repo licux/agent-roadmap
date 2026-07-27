@@ -5,9 +5,9 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
-    "anthropic==0.102.0",
+    "anthropic==0.120.0",
     "python-dotenv==1.2.2",
-    "strands-agents[anthropic]==1.40.0",
-    "streamlit==1.57.0",
-    "tavily-python==0.7.24",
+    "strands-agents[anthropic]==1.50.1",
+    "streamlit==1.60.0",
+    "tavily-python==0.7.26",
 ]
