@@ -349,7 +349,7 @@ uv add streamlit==1.60.0
 touch 3_gui.py
 ```
 
-`3_gui.py`を開き、コードを記載していきます。エージェントの定義部分までは`2_travel_agent.py`とほぼ同じです。`asyncio`と`streamlit`のインポートが追加されています。
+`3_gui.py`を開き、コードを記載していきます。ツールとモデル、システムプロンプトの定義までは`2_travel_agent.py`と同じです。`asyncio`と`streamlit`のインポートが追加されています。
 
 ```python
 # strands-handson/3_gui.py (1/5)
@@ -409,25 +409,34 @@ model = AnthropicModel(
 # システムプロンプトの定義
 SYSTEM_PROMPT = """あなたはお出かけプランナーです。
 ユーザーの希望に合わせて、天気と最新のイベント情報をもとにお出かけプランを提案してください。"""
-
-# AIエージェントの作成
-agent = Agent(
-    model=model,
-    system_prompt=SYSTEM_PROMPT,
-    tools=[get_weather, search_events],
-)
 ```
 
-コードの後半からはStreamlitによるチャット画面の実装になります。まず、ページタイトルの表示と会話履歴の初期化を行います。`st.session_state`オブジェクトは、Streamlitがページの再表示をまたいでデータを保持するための領域です。今回は、ユーザーとエージェントの会話履歴を保持しています。
+ここからはStreamlitによるチャット画面の実装になります。まず、ページタイトルの表示と会話履歴の初期化、AIエージェントの作成を行います。
+
+Streamlitは、ユーザーが操作するたびにスクリプト全体を先頭から再実行します。そのため、通常の変数に入れたデータは再実行のたびに失われてしまいます。`st.session_state`オブジェクトは、Streamlitがページの再表示をまたいでデータを保持するための領域で、ここでは2種類の会話履歴を保持しています。`messages`は画面表示用の履歴、`history`はAIエージェント自身の履歴（ツール呼び出しなども含む完全な履歴）です。
+
+AIエージェントも再実行のたびに作り直されるため、`2_travel_agent.py`とは異なり、保存しておいた`history`を`messages`引数に渡して会話履歴を復元しています。これにより、AIエージェントは前のターンの内容を踏まえて応答できます。
 
 ```python
 # strands-handson/3_gui.py (2/5)
 # ページタイトルの表示
 st.title("🗺️ お出かけプランナー")
 
-# Streamlitは操作のたびにスクリプト全体が再実行されるため、session_stateで会話履歴を保持
+# Streamlitは操作のたびにスクリプト全体が再実行されるため、session_stateで会話履歴を保持。
+# ・st.session_state.messages : 表示用の会話履歴
+# ・st.session_state.history : エージェントの会話履歴
 if "messages" not in st.session_state:
     st.session_state.messages = []
+if "history" not in st.session_state:
+    st.session_state.history = []
+
+# エージェントは再実行のたびに生成されるため、保存しておいた会話履歴をmessages引数で復元する。
+agent = Agent(
+    model=model,
+    system_prompt=SYSTEM_PROMPT,
+    tools=[get_weather, search_events],
+    messages=st.session_state.history.copy(),
+)
 ```
 
 次に、保存された会話履歴を画面に表示する部分の実装です。`st.session_state`オブジェクトに保持されている会話履歴の各メッセージを、順に表示しています。`st.chat_message`オブジェクトは、メッセージのrole（「user」か「assistant」）に応じて吹き出しの見た目を自動で切り替えます。また、エージェントの応答では、実行されたツールの名前を応答内容の上に表示しています。
@@ -495,9 +504,15 @@ if prompt := st.chat_input("お出かけの相談をしてください"):
             "content": accumulated_text,
             "tool_names": tool_names,
         })
+
+        # エージェントの会話履歴（ツール呼び出し等も含む完全な履歴）を保存し、
+        # 次のターンでmessages引数として復元できるようにする
+        st.session_state.history = agent.messages
 ```
 
-`st.chat_input`オブジェクトでユーザーの入力を受け取り、ユーザーのメッセージを画面に表示します。次に`st.status`オブジェクトでstatusコンポーネントを作成し、`asyncio.run`メソッドで`run_agent`関数を実行しています。応答は`st.session_state`オブジェクトに保存されるため、次の入力後も過去の会話が画面に残り続けます。
+`st.chat_input`オブジェクトでユーザーの入力を受け取り、ユーザーのメッセージを画面に表示します。次に`st.status`オブジェクトでstatusコンポーネントを作成し、`asyncio.run`メソッドで`run_agent`関数を実行しています。
+
+応答が返ってきたら、表示用の履歴（`messages`）に応答内容とツール名を追加し、AIエージェントの履歴（`agent.messages`）を`history`に保存します。どちらも`st.session_state`オブジェクトに保存されるため、次の入力後も過去の会話が画面に残り続け、AIエージェントも会話の流れを踏まえて応答できます。
 
 ### 動作確認
 
@@ -625,8 +640,6 @@ def search_events(query: str) -> str:
 SYSTEM_PROMPT = f"""あなたはお出かけプランナーです。
 今日の日付は {date.today()} です。
 ユーザーの希望に合わせて、天気と最新のイベント情報をもとにお出かけプランを提案してください。"""
-
-# （中略：AIエージェントの作成は3_gui.pyと同じ）
 
 # ページタイトルの表示
 st.title("🗺️ お出かけプランナー (Tavily)")
