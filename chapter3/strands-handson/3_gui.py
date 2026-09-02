@@ -17,7 +17,7 @@ MODEL_ID = os.getenv("MODEL_NAME")
 # ツールの定義
 @tool
 def get_weather() -> str:
-    """東京の天気予報を取得する。今日から16日先までの予報と現在の天気を返す。"""
+    """東京の天気予報を取得する。当日を含む16日分の予報と現在の天気を返す。"""
     # Open-Meteo API（無料・キー不要）で東京の天気を取得
     params = urllib.parse.urlencode({
         "latitude": 35.6895,
@@ -54,7 +54,6 @@ model = AnthropicModel(
 # システムプロンプトの定義
 SYSTEM_PROMPT = """あなたはお出かけプランナーです。
 ユーザーの希望に合わせて、天気と最新のイベント情報をもとにお出かけプランを提案してください。"""
-
 
 # ページタイトルの表示
 st.title("🗺️ お出かけプランナー")

@@ -1,5 +1,4 @@
 # 必要なライブラリのインポート
-# 必要なライブラリのインポート
 import os
 import urllib.request
 import urllib.parse
@@ -21,7 +20,7 @@ tavily_client = TavilyClient(api_key=os.getenv("TAVILY_API_KEY"))
 # ツールの定義
 @tool
 def get_weather(city: str = "Tokyo") -> str:
-    """指定した都市の天気予報を取得する。cityは英語の都市名で指定すること（例: Tokyo, Osaka, Sapporo）。今日から16日先までの予報と現在の天気を返す。"""
+    """指定した都市の天気予報を取得する。cityは英語の都市名で指定すること（例: Tokyo, Osaka, Sapporo）。当日を含む16日分の予報と現在の天気を返す。"""
     # Open-Meteo Geocoding API（無料・キー不要）で都市名から緯度経度を取得
     geo_params = urllib.parse.urlencode({"name": city, "count": 1, "language": "ja"})
     with urllib.request.urlopen(f"https://geocoding-api.open-meteo.com/v1/search?{geo_params}") as res:
