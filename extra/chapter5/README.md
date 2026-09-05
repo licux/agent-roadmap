@@ -91,13 +91,55 @@ touch recipes.json
 ```json
 // recipe-agent/recipes.json
 [
-    {"id":"R001","name":"鶏むね肉のグリル","genre":"和食","cooking_time_min":20,"ingredients":["鶏むね肉","塩","オリーブオイル"]},
-    {"id":"R002","name":"カプレーゼ","genre":"洋食","cooking_time_min":10,"ingredients":["トマト","モッツァレラ","バジル"]},
-    {"id":"R003","name":"麻婆豆腐","genre":"中華","cooking_time_min":25,"ingredients":["豆腐","豚ひき肉","豆板醤"]},
-    {"id":"R004","name":"鮭のホイル焼き","genre":"和食","cooking_time_min":25,"ingredients":["鮭","しめじ","玉ねぎ"]},
-    {"id":"R005","name":"カルボナーラ","genre":"洋食","cooking_time_min":15,"ingredients":["スパゲッティ","卵","ベーコン"]},
-    {"id":"R006","name":"野菜炒め","genre":"中華","cooking_time_min":15,"ingredients":["キャベツ","豚肉","ごま油"]},
-    {"id":"R007","name":"豚の生姜焼き","genre":"和食","cooking_time_min":20,"ingredients":["豚ロース","生姜","醤油"]}
+  {
+    "id": "R001",
+    "name": "鶏むね肉のグリル",
+    "genre": "和食",
+    "cooking_time_min": 20,
+    "ingredients": ["鶏むね肉", "塩", "オリーブオイル"]
+  },
+  {
+    "id": "R002",
+    "name": "カプレーゼ",
+    "genre": "洋食",
+    "cooking_time_min": 10,
+    "ingredients": ["トマト", "モッツァレラ", "バジル"]
+  },
+  {
+    "id": "R003",
+    "name": "麻婆豆腐",
+    "genre": "中華",
+    "cooking_time_min": 25,
+    "ingredients": ["豆腐", "豚ひき肉", "豆板醤"]
+  },
+  {
+    "id": "R004",
+    "name": "鮭のホイル焼き",
+    "genre": "和食",
+    "cooking_time_min": 25,
+    "ingredients": ["鮭", "しめじ", "玉ねぎ"]
+  },
+  {
+    "id": "R005",
+    "name": "カルボナーラ",
+    "genre": "洋食",
+    "cooking_time_min": 15,
+    "ingredients": ["スパゲッティ", "卵", "ベーコン"]
+  },
+  {
+    "id": "R006",
+    "name": "野菜炒め",
+    "genre": "中華",
+    "cooking_time_min": 15,
+    "ingredients": ["キャベツ", "豚肉", "ごま油"]
+  },
+  {
+    "id": "R007",
+    "name": "豚の生姜焼き",
+    "genre": "和食",
+    "cooking_time_min": 20,
+    "ingredients": ["豚ロース", "生姜", "醤油"]
+  }
 ]
 ```
 
@@ -537,13 +579,10 @@ Streamlitが起動すると、ターミナルにローカルホストのURL「`h
 
 ## 次のステップ
 
-以上で、MCPを利用したAIエージェント構築のハンズオンは完了です。MCPの公式Python SDKを使ってレシピ検索MCPサーバーを自作し、既製のFilesystem MCPサーバーと組み合わせて、献立を提案してファイルに書き出す料理レシピアシスタントエージェントを構築しました。AIエージェントから見ると自作のMCPサーバーも既製のMCPサーバーも同じように扱えること、そしてstdio方式のMCPサーバーはAIエージェントの実行に合わせて自動的に起動・終了することを確認できました。
+以上で、MCPを利用したAIエージェント構築のハンズオンは完了です。MCPの公式Python SDKを使ってレシピ検索MCPサーバーを自作し、既製のFilesystem MCPサーバーと組み合わせて、献立を提案してファイルに書き出す料理レシピアシスタントエージェントを構築しました。AIエージェントから見ると自作のMCPサーバーも既製のMCPサーバーも同じように扱えること、そしてMCPサーバーの起動から終了までをAIエージェント側が管理してくれることを確認できました。
 
-本ハンズオンで自作したMCPサーバーは、Strands Agents以外のMCPホストからもそのまま利用できます。たとえばClaude Codeを利用している場合は、`chapter5/recipe-agent`ディレクトリで以下のコマンドを実行すると`recipe-assistant`を登録でき、Claude Codeとの会話の中で`search_recipes`や`get_recipe_detail`が呼び出されるようになります。
+本ハンズオンではStrands Agentsから`recipe-assistant`を利用しましたが、MCPという共通プロトコルに沿って実装したサーバーは、MCPに対応したホストであれば同じように利用できます。コーディングエージェントなど、手元のマシンで動作するMCP対応のホストを普段使っていれば、`recipe-assistant`を登録して、サーバー側のコードを変えることなく同じツールが呼び出せることを確かめてみてください。
 
-```bash
-# コマンド（chapter5/recipe-agent で実行）
-claude mcp add recipe-assistant -- uv run --directory $(pwd) 1_server.py
-```
+また、本ハンズオンで利用したstdio方式は、ホストがMCPサーバーをサブプロセスとして起動する方式のため、MCPサーバーはホストと同じマシン上で動く必要があります。Webブラウザ上で動作するホストのように別のマシンから利用する場合や、1つのMCPサーバーを複数のクライアントで共有する場合には、本書の5.2で紹介したstreamable HTTP方式でMCPサーバーを常駐させることになります。クラウド環境にMCPサーバーを配置して公開する場合も、この方式が前提です。`recipe-assistant`は`mcp.run()`に`transport="streamable-http"`を指定するだけでこの方式でも起動できるので、興味があれば2つの方式の違いを実際に試してみてください。
 
-また、`extra/chapter6/`には、ガードレールとHuman-in-the-Loopを組み込んだAIエージェントのハンズオンを用意しています。あわせて取り組んでみてください。
+`extra/chapter6/`には、ガードレールとHuman-in-the-Loopを組み込んだAIエージェントのハンズオンを用意しています。あわせて取り組んでみてください。
