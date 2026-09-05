@@ -42,7 +42,7 @@ Strands Agentsはモデル駆動型のフレームワークです。利用する
 mkdir -p /workspaces/agent-roadmap/chapter3
 cd /workspaces/agent-roadmap/chapter3
 
-uv init strands-handson --python 3.14
+uv init strands-handson --python 3.14 --no-package
 cd strands-handson
 ```
 

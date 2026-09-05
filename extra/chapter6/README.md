@@ -34,7 +34,7 @@ AIエージェントのリスク対策は、1つだけを採用すれば十分�
 mkdir -p /workspaces/agent-roadmap/chapter6
 cd /workspaces/agent-roadmap/chapter6
 
-uv init guarded-agent --python 3.14
+uv init guarded-agent --python 3.14 --no-package
 cd guarded-agent
 
 uv add anthropic==0.102.0 strands-agents[anthropic]==1.39.0 python-dotenv==1.2.2
