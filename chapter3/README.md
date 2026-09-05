@@ -42,7 +42,7 @@ Strands Agentsはモデル駆動型のフレームワークです。利用する
 mkdir -p /workspaces/agent-roadmap/chapter3
 cd /workspaces/agent-roadmap/chapter3
 
-uv init strands-handson --python 3.14
+uv init strands-handson --python 3.14 --no-package
 cd strands-handson
 ```
 
@@ -188,7 +188,9 @@ area,name,genre,description
 下北沢,シモキタメロディさんぽ,音楽,下北沢エリアの屋外ステージ各所で開催。街を歩きながら楽しむ音楽イベント
 ```
 
-`2_travel_agent.py`にコードを記載していきます。まず、必要なライブラリをインポートし、環境変数を読み込みます。
+`2_travel_agent.py`にコードを記載していきます。以降は、1つのファイルのコードを5つのブロックに区切って順番に説明していきます。「(1/5)」のような番号はブロックの順番を表しているので、上から順にファイルへ追記していってください。
+
+まず、必要なライブラリをインポートし、環境変数を読み込みます。
 
 ```python
 # strands-handson/2_travel_agent.py (1/5)

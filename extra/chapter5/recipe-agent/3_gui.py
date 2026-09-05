@@ -16,11 +16,11 @@ MODEL_ID = os.getenv("MODEL_NAME")
 # Filesystem MCPサーバーは起動時に許可ディレクトリの存在を確認するため、無ければ作成しておく
 Path("output").mkdir(exist_ok=True)
 
-# MCPサーバーを起動するための関数を定義（MCPClientが必要なタイミングで内部から呼び出す）
-def start_recipe_server():
+# MCPサーバーとの通信路（transport）を作る関数を定義（MCPClientが必要なタイミングで内部から呼び出し、サーバーをサブプロセスとして起動する）
+def create_recipe_transport():
     return stdio_client(StdioServerParameters(command="uv", args=["run", "1_server.py"]))
 
-def start_filesystem_server():
+def create_filesystem_transport():
     return stdio_client(StdioServerParameters(
         command="npx",
         args=["-y", "@modelcontextprotocol/server-filesystem", "./output"],
@@ -29,9 +29,9 @@ def start_filesystem_server():
 # Streamlitは操作のたびにスクリプト全体が再実行されるため、@st.cache_resourceでMCPクライアントとエージェントを1度だけ生成し、サブプロセスを使い回す
 @st.cache_resource
 def init_agent():
-    # 自作と既存の2つのMCPサーバーへの接続を作成
-    recipe_client = MCPClient(start_recipe_server)
-    fs_client = MCPClient(start_filesystem_server)
+    # 自作と既製の2つのMCPサーバーへの接続を作成
+    recipe_client = MCPClient(create_recipe_transport)
+    fs_client = MCPClient(create_filesystem_transport)
 
     # MCPClientをそのままtoolsに渡すと、Agentがライフサイクル（起動・終了）を自動管理する
     agent = Agent(
