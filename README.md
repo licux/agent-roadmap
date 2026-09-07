@@ -12,14 +12,14 @@
 - **発売日**: 2026年9月17日
 - **ISBN**: 978-4-297-15875-0
 - **ページ数**: 256ページ
-- **価格**: 2,200円
+- **価格**: 2,860円（本体2,600円＋税10%）
 
 書籍の詳細情報: https://www.amazon.co.jp/gp/product/4297158752
 
 ## 🎯 リポジトリについて
 
-- `chapter3/` は書籍掲載のハンズオンです。Strands Agents SDK を使い、最小構成のエージェントからツールを持つエージェント、Streamlit のチャットUI、Web検索対応の発展版までを段階的に作っていきます。
-- `extra/` は書籍に掲載しきれなかったハンズオンをおまけとして載せています。MCPサーバーと連携するエージェント（`chapter5/`）と、ガードレールおよびHuman-in-the-Loopを組み込んだエージェント（`chapter6/`）を扱います。
+- `chapter3/` は書籍掲載のハンズオンです。Strands Agents SDK を使い、最小構成のエージェントからツールを持つエージェントまでを段階的に作っていきます。
+- `extra/` は書籍に掲載しきれなかったハンズオンをおまけとして載せています。`chapter3/` のエージェントに Streamlit のチャットUIと Web検索を追加する発展版（`chapter3/`）、MCPサーバーと連携するエージェント（`chapter5/`）、ガードレールおよびHuman-in-the-Loopを組み込んだエージェント（`chapter6/`）を扱います。
 
 ## 📁 ディレクトリ構成
 
@@ -29,6 +29,8 @@
 │   └── strands-handson/          # 第3章: Strands Agents SDKでのエージェント開発
 │
 ├── extra/                        # 書籍未掲載のおまけハンズオン
+│   ├── chapter3/
+│   │   └── strands-handson/      # 第3章の発展版: StreamlitのチャットUIとWeb検索
 │   ├── chapter5/
 │   │   └── recipe-agent/         # MCPサーバーと連携するエージェント
 │   └── chapter6/
