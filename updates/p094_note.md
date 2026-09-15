@@ -36,9 +36,6 @@ AI エージェントがモデルを呼び出す部分は、Microsoft.Extensions
 **この関係は .NET に限った話である点にご注意ください。**
 Microsoft Agent Framework v1.0 は .NET と Python の2言語で提供されていますが、Microsoft.Extensions.AI は .NET のライブラリであり、Python 版の Microsoft Agent Framework とは関係がありません。
 
-本項は、ymd65536 さん（X: [@ymd65536](https://x.com/ymd65536)）の次の記事でいただいた
-ご指摘をきっかけに追記しました。ありがとうございました。
-
 - [【書評】AI時代の道しるべ、AIエージェント開発の知識地図 〜仕組みから開発、運用、ガバナンスまで〜](https://ymd65536.hatenablog.com/entry/2026/09/12/122042)
 
 ### 参考
@@ -46,6 +43,12 @@ Microsoft Agent Framework v1.0 は .NET と Python の2言語で提供されて�
 - [Introducing Microsoft Agent Framework (Preview) - .NET Blog](https://devblogs.microsoft.com/dotnet/introducing-microsoft-agent-framework-preview/)
 - [Microsoft.Extensions.AI libraries - Microsoft Learn](https://learn.microsoft.com/en-us/dotnet/ai/microsoft-extensions-ai)
 - [AI and Vector Data Extensions are now Generally Available (GA) - .NET Blog](https://devblogs.microsoft.com/dotnet/ai-vector-data-dotnet-extensions-ga/)
+
+## 謝辞
+
+本項は、ymd65536 さん（X: [@ymd65536](https://x.com/ymd65536)）の次の記事でいただいたご指摘をきっかけに追記しました。ありがとうございました。
+
+- [【書評】AI時代の道しるべ、AIエージェント開発の知識地図 〜仕組みから開発、運用、ガバナンスまで〜](https://ymd65536.hatenablog.com/entry/2026/09/12/122042)
 
 ---
 

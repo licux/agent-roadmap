@@ -24,7 +24,3 @@ Kotlin 版ならではの強化も2点あります。1つは **Java からの利
 - [Agent Development Kit 公式サイト](https://adk.dev/)（2026-09-15 参照）
 - [Announcing ADK for Kotlin 1.0 - Google Developers Blog](https://developers.googleblog.com/announcing-adk-for-kotlin-10-building-production-ready-ai-agents-in-kotlin-android-and-beyond/)
 - [Announcing ADK for Kotlin and ADK for Android 0.1.0 - Google Developers Blog](https://developers.googleblog.com/adk-kotlin-android-building-ai-agents/)
-
-本項は、次の記事でいただいたご指摘をきっかけに追記しました。ありがとうございました。
-
-- [ymd65536 さんのブログ記事](https://ymd65536.hatenablog.com/entry/2026/09/12/122042)
