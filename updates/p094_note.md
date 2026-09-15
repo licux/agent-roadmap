@@ -1,10 +1,8 @@
-# p.94 Microsoft Agent Framework について
+# p.94 Microsoft Agent Framework についての補足
 
 **種別**: `note` ／ **最終更新**: 2026-09-15
 
 [← 一覧に戻る](README.md)
-
-本ページに関する追加説明が2件あります。
 
 ---
 
@@ -21,45 +19,27 @@
 
 ### 補足
 
-本書では Microsoft Agent Framework を Semantic Kernel と AutoGen の統合という
-系譜から説明しましたが、**.NET で開発する場合は、 Microsoft.Extensions.AI
-との関係も押さえておくと、その位置づけが明確になります。** 読者の方からご指摘をいただいたため補足します。
+本書では、 Microsoft Agent Framework を Semantic Kernel と AutoGen の統合という系譜から説明しましたが、**.NET で開発する場合は、 Microsoft.Extensions.AIとの関係も押さえておくと、その位置づけがより明確になります。**
 
-Microsoft.Extensions.AI は、.NET における生成AI機能の抽象化レイヤーです。
-`IChatClient`（チャット系モデルへのアクセス）と `IEmbeddingGenerator<TInput, TEmbedding>`
-（埋め込み生成）を中核とし、2025年5月21日に正式リリースされています。特定のモデルプロバイダーに依存しないインターフェースを提供し、キャッシュ・テレメトリ・レートリミットといったミドルウェアを重ねられる点が特徴です。
+Microsoft.Extensions.AI は、.NET から生成AIを扱うための共通インターフェースを定めた
+ライブラリで、2025年5月21日に正式リリースされました。このライブラリを利用することで、モデルの呼び出しや埋め込みの生成といった操作を、モデルの提供元によらず同じ形で書くことができます。
 
-Microsoft Agent Framework の .NET 版は、この Microsoft.Extensions.AI の上に構築されています。
-Microsoft の .NET Blog には次のように記されています。
-
-> Microsoft Agent Framework leverages established technologies to simplify agent development
-> for .NET developers: **Semantic Kernel** – Provides robust orchestration;
-> **AutoGen** – Enables advanced multi-agent collaboration and cutting-edge research-driven
-> techniques; **Microsoft.Extensions.AI** – Delivers standardized AI building blocks for .NET.
+Microsoft Agent Framework の .NET 版は、この Microsoft.Extensions.AI の上に構築されています。.NET Blog（Microsoft の .NET 開発者向け公式ブログ）には次のように記されています。
 
 > The flexibility to use any compatible AI model provider comes from Microsoft.Extensions.AI,
 > which standardizes model access through the `IChatClient` interface.
 
-具体的な接点は `ChatClientAgent` です。任意の `IChatClient` を受け取る設計になっているため、
-OpenAI、Azure OpenAI、Microsoft Foundry、Ollama、GitHub Models といったプロバイダーを、
-エージェント側のコードを変えずに差し替えられます。
+AI エージェントがモデルを呼び出す部分は、Microsoft.Extensions.AI の `IChatClient` というインターフェースが担っています。Microsoft Agent Framework の `ChatClientAgent` クラスはこれを外から受け取る形になっているため、**使うモデルを変えるときは、渡す `IChatClient` を差し替えるだけで、AI エージェント側のコードには手を入れる必要はありません。**
 
-.NET における AI 開発の技術スタックを整理すると、次のようになります。
-
-```
-Microsoft Agent Framework   エージェントとワークフローの層
-                            （2025年10月プレビュー / 2026年4月 v1.0）
-        ↑
-Semantic Kernel             オーケストレーションの層（MAF に統合）
-        ↑
-Microsoft.Extensions.AI     モデルアクセスの抽象化層（2025年5月 GA）
-        ↑
-各モデルプロバイダーの SDK
-```
+つまり .NET では、**Microsoft.Extensions.AI がモデルとの接続を引き受け、その上で Microsoft Agent Framework が AI エージェントとワークフローを組み立てる**、という役割分担になっています。すでに Microsoft.Extensions.AI を使っているプロジェクトであれば、モデル接続まわりの実装はそのままに、その上に Microsoft Agent Framework を導入できます。
 
 **この関係は .NET に限った話である点にご注意ください。**
-Microsoft Agent Framework v1.0 は .NET と Python の2言語で提供されていますが、Microsoft.Extensions.AI は
-.NET のライブラリであり、Python 版の Microsoft Agent Framework とは関係がありません。
+Microsoft Agent Framework v1.0 は .NET と Python の2言語で提供されていますが、Microsoft.Extensions.AI は .NET のライブラリであり、Python 版の Microsoft Agent Framework とは関係がありません。
+
+本項は、ymd65536 さん（X: [@ymd65536](https://x.com/ymd65536)）の次の記事でいただいた
+ご指摘をきっかけに追記しました。ありがとうございました。
+
+- [【書評】AI時代の道しるべ、AIエージェント開発の知識地図 〜仕組みから開発、運用、ガバナンスまで〜](https://ymd65536.hatenablog.com/entry/2026/09/12/122042)
 
 ### 参考
 
@@ -67,18 +47,13 @@ Microsoft Agent Framework v1.0 は .NET と Python の2言語で提供されて�
 - [Microsoft.Extensions.AI libraries - Microsoft Learn](https://learn.microsoft.com/en-us/dotnet/ai/microsoft-extensions-ai)
 - [AI and Vector Data Extensions are now Generally Available (GA) - .NET Blog](https://devblogs.microsoft.com/dotnet/ai-vector-data-dotnet-extensions-ga/)
 
-本項は、次の記事でいただいたご指摘をきっかけに追記しました。ありがとうございました。
-
-- [ymd65536 さんのブログ記事](https://ymd65536.hatenablog.com/entry/2026/09/12/122042)
-
 ---
 
 ## Go 版の提供形態について
 
 ### 本書の記述
 
-> Python版、.NET版、Go版で一貫したAPIが提供されているため、チームの言語スキルに応じて
-> 選択できます。
+> Python版、.NET版、Go版で一貫したAPIが提供されているため、チームの言語スキルに応じて選択できます。
 >
 > （注1）2026年7月時点でパブリックプレビュー。
 >
@@ -88,17 +63,15 @@ Microsoft Agent Framework v1.0 は .NET と Python の2言語で提供されて�
 
 注釈のとおり Go 版はパブリックプレビューですが、Python 版、.NET 版とは提供形態が異なるため、選定の際は次の点にご注意ください。この状況は2026年9月時点でも変わっていません。
 
-Go 版は `microsoft/agent-framework` ではなく、**`microsoft/agent-framework-go` という別の
-リポジトリ**で開発されています。README には
-「is in public preview and is currently evolving outside the core upstream codebase」
-と記載されており、コア本体とは別の歩調で進んでいます。
+GitHub のリポジトリが分かれており、Python 版と .NET 版は
+[microsoft/agent-framework](https://github.com/microsoft/agent-framework)、Go 版は
+[microsoft/agent-framework-go](https://github.com/microsoft/agent-framework-go) で開発されています。後者の README には「is in public preview and is currently evolving outside the core upstream codebase」と書かれており、**`microsoft/agent-framework` 側の開発とは切り離して進められているため、そちらに入った変更がそのまま Go 版に反映されるわけではありません。**
 
-2026年9月時点では、宣言的エージェント（Declarative agents）、RAG、CodeAct、
-functional workflows が未実装です。「一貫したAPI」は設計方針としては正しいものの、
-**現時点で Go 版から使える機能は Python 版・.NET 版の部分集合**とお考えください。
-Go を主軸に据える場合は、必要な機能が実装済みかを事前にご確認ください。
-
-なお v1.0 の一般提供（2026年4月3日）は .NET 版と Python 版が対象で、Go 版は含まれていません。
+2026年9月時点で Go 版に実装されていないのは、宣言的エージェント（Declarative agents）、
+RAG、CodeAct、functional workflows です。3つの言語で同じ考え方のAPIを提供するという
+方針に変わりはありませんが、**Go 版で実際に使える機能は、現時点では Python 版・.NET 版で
+使える機能の一部にとどまります。** Go を主軸に据える場合は、必要な機能が実装済みかどうかを
+事前にご確認ください。
 
 ### 参考
 
