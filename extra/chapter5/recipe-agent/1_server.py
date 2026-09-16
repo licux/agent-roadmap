@@ -1,10 +1,10 @@
 # 必要なライブラリのインポート
 import json
 from pathlib import Path
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 
 # MCPサーバーの初期化（"recipe-assistant"はサーバー名）
-mcp = FastMCP("recipe-assistant")
+mcp = MCPServer("recipe-assistant")
 
 # recipes.jsonを起動時に一度だけ読み込み
 RECIPES = json.loads((Path(__file__).parent / "recipes.json").read_text(encoding="utf-8"))

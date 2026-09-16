@@ -56,11 +56,11 @@ MODEL_NAME=<モデル名>
 
 ```bash
 # コマンド
-uv add mcp==1.29.1 "strands-agents[anthropic]"==1.50.1 anthropic==0.120.0 python-dotenv==1.2.2
+uv add mcp==2.1.1 "strands-agents[anthropic]"==1.56.0 anthropic==0.120.0 python-dotenv==1.2.2
 echo ".env" >> .gitignore
 ```
 
-chapter3で導入したパッケージに加えて、MCPの公式Python SDKである`mcp`もインストールしています。
+chapter3と同じ構成のパッケージに加えて、MCPの公式Python SDKである`mcp`もインストールしています。`strands-agents`のバージョンはchapter3と異なり、mcp 2.x系に対応したものを指定しています。
 
 - MCP Python SDK: https://github.com/modelcontextprotocol/python-sdk
 
@@ -163,13 +163,13 @@ touch 1_server.py
 # 必要なライブラリのインポート
 import json
 from pathlib import Path
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 
 # MCPサーバーの初期化（"recipe-assistant"はサーバー名）
-mcp = FastMCP("recipe-assistant")
+mcp = MCPServer("recipe-assistant")
 ```
 
-MCPの公式Python SDKに含まれる`FastMCP`を利用して、MCPサーバーのインスタンスを生成します。`FastMCP`は、MCPサーバーを動かすために必要な通信処理やツールの仕様定義を内部で引き受けてくれる仕組みで、開発者はツールの本体ロジックの実装に集中できます。引数の「recipe-assistant」はサーバー名で、ホスト側でこのMCPサーバーを識別するために使われます。
+MCPの公式Python SDKに含まれる`MCPServer`クラスを利用して、MCPサーバーのインスタンスを生成します。`MCPServer`は、MCPサーバーを動かすために必要な通信処理やツールの仕様定義を内部で引き受けてくれる仕組みで、開発者はツールの本体ロジックの実装に集中できます。引数の「recipe-assistant」はサーバー名で、ホスト側でこのMCPサーバーを識別するために使われます。
 
 次に、`recipes.json`をMCPサーバー起動時に1度だけ読み込みます。読み込んだリストをモジュールレベルの変数`RECIPES`として保持し、ツールの呼び出しごとに何度もファイルを開かないようにしています。
 
