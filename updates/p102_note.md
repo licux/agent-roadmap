@@ -1,6 +1,6 @@
 # p.102 フレームワークの選び方について
 
-**種別**: `note` ／ **最終更新**: 2026-09-15
+**種別**: `note` ／ **最終更新**: 2026-09-16
 
 [← 一覧に戻る](README.md)
 
@@ -17,7 +17,7 @@
 
 本書では、開発に使うプログラミング言語を軸にフレームワークを絞り込む手順を紹介し、Java / Kotlin であれば ADK が「現状唯一の選択肢」であると記載しています。これは、本書で取り上げたフレームワークの中での話であり、Java / Kotlin に対応したものはほかにもあります。
 
-たとえば **Koog**（JetBrains）は、Kotlin と Java の両方に対応した AI エージェントフレームワークで、どちらの言語からも同等の機能を利用できます。処理の流れをグラフとして定義でき、MCP や A2A による連携、AI エージェントの状態の保存と復元、OpenTelemetry によるトレースにも対応しています。
+たとえば **Koog**（JetBrains）は、Kotlin と Java の両方に対応した AI エージェントフレームワークで、どちらの言語からも同等の機能を利用できます。処理の流れをグラフとして定義でき、MCP や A2A（いずれもベータ版）による連携、AI エージェントの状態の保存と復元、OpenTelemetry によるトレースにも対応しています。
 
 このほか **LangChain4j** や **Spring AI** も、Java で生成AIアプリケーションを構築するフレームワークとして広く使われています。AI エージェント専用ではありませんが、ツール呼び出しなど AI エージェントの構築に必要な機能を備えています。
 
@@ -25,10 +25,11 @@
 
 ## 参考
 
-- [Koog 公式サイト（JetBrains）](https://www.jetbrains.com/koog/)（2026-09-15 参照）
+- [Koog 公式サイト（JetBrains）](https://www.jetbrains.com/koog/)（2026-09-16 参照）
+- [Koog ドキュメント](https://docs.koog.ai/)（2026-09-16 参照）
 - [Koog 1.0 Is Out - The JetBrains Blog](https://blog.jetbrains.com/ai/2026/05/koog-1-0-is-out-stable-core-better-interop-and-multiplatform-observability/)
 - [JetBrains/koog - GitHub](https://github.com/JetBrains/koog)
-- [Agent Development Kit 公式サイト](https://adk.dev/)（2026-09-15 参照）
+- [Agent Development Kit 公式サイト](https://adk.dev/)（2026-09-16 参照）
 
 ## 謝辞
 

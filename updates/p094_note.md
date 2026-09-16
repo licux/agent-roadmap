@@ -1,6 +1,6 @@
 # p.94 Microsoft Agent Framework についての補足
 
-**種別**: `note` ／ **最終更新**: 2026-09-15
+**種別**: `note` ／ **最終更新**: 2026-09-16
 
 [← 一覧に戻る](README.md)
 
@@ -36,15 +36,13 @@ AI エージェントがモデルを呼び出す部分は、Microsoft.Extensions
 **この関係は .NET に限った話である点にご注意ください。**
 Microsoft Agent Framework v1.0 は .NET と Python の2言語で提供されていますが、Microsoft.Extensions.AI は .NET のライブラリであり、Python 版の Microsoft Agent Framework とは関係がありません。
 
-- [【書評】AI時代の道しるべ、AIエージェント開発の知識地図 〜仕組みから開発、運用、ガバナンスまで〜](https://ymd65536.hatenablog.com/entry/2026/09/12/122042)
-
 ### 参考
 
 - [Introducing Microsoft Agent Framework (Preview) - .NET Blog](https://devblogs.microsoft.com/dotnet/introducing-microsoft-agent-framework-preview/)
 - [Microsoft.Extensions.AI libraries - Microsoft Learn](https://learn.microsoft.com/en-us/dotnet/ai/microsoft-extensions-ai)
 - [AI and Vector Data Extensions are now Generally Available (GA) - .NET Blog](https://devblogs.microsoft.com/dotnet/ai-vector-data-dotnet-extensions-ga/)
 
-## 謝辞
+### 謝辞
 
 本項は、ymd65536 さん（X: [@ymd65536](https://x.com/ymd65536)）の次の記事でいただいたご指摘をきっかけに追記しました。ありがとうございました。
 
@@ -70,9 +68,9 @@ GitHub のリポジトリが分かれており、Python 版と .NET 版は
 [microsoft/agent-framework](https://github.com/microsoft/agent-framework)、Go 版は
 [microsoft/agent-framework-go](https://github.com/microsoft/agent-framework-go) で開発されています。後者の README には「is in public preview and is currently evolving outside the core upstream codebase」と書かれており、**`microsoft/agent-framework` 側の開発とは切り離して進められているため、そちらに入った変更がそのまま Go 版に反映されるわけではありません。**
 
-2026年9月時点で Go 版に実装されていないのは、宣言的エージェント（Declarative agents）、RAG、CodeAct、functional workflows です。3つの言語で同じ考え方のAPIを提供するという方針に変わりはありませんが、**Go 版で実際に使える機能は、現時点では Python 版・.NET 版で使える機能の一部にとどまります。** Go を主軸に据える場合は、必要な機能が実装済みかどうかを事前にご確認ください。
+`microsoft/agent-framework-go` の README の Preview status には、宣言的エージェント（Declarative agents）、RAG、CodeAct、functional workflows が未提供として挙げられています。このほかにも、Handoff orchestration や Foundry-hosted deployment、DevUI など、Go SDK では未実装とされている機能があります。3つの言語で同じ考え方のAPIを提供するという方針に変わりはありませんが、**Go 版で実際に使える機能は、現時点では Python 版・.NET 版で使える機能の一部にとどまります。** Go を主軸に据える場合は、必要な機能が実装済みかどうかを事前にご確認ください。
 
 ### 参考
 
-- [microsoft/agent-framework-go - GitHub](https://github.com/microsoft/agent-framework-go)（2026-09-15 参照）
+- [microsoft/agent-framework-go - GitHub](https://github.com/microsoft/agent-framework-go)（2026-09-16 参照）
 - [Microsoft Agent Framework Version 1.0](https://devblogs.microsoft.com/agent-framework/microsoft-agent-framework-version-1-0/)
